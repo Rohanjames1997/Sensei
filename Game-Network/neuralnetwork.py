@@ -2,20 +2,30 @@ import numpy as np
 import pandas as pd
 import math
 import time
+import argparse
 
 def main():
     #g = Graph()
     np.random.seed(0)
-    test()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--training-data-size', type=int, default=10000)
+    parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--batch-size', type=int, default=100)
+    parser.add_argument('--alpha', type=float, default=1)
+    #parser.add_argument('--hidden-layers', type=list, default=[5])
+    parser.add_argument('--inputs', type=int, default=5)
+    parser.add_argument('--outputs', type=int, default=2)
+    args = parser.parse_args()
+    test(inp=args.inputs, outp=args.outputs, data_size=args.training_data_size, in_epochs=args.epochs, batch_size=args.batch_size, in_alpha=args.alpha)
 
-def test():
-    inp = 5
-    size = [5]
-    data_size = 10000
-    in_epochs = 20
-    batch_size = 100
-    in_alpha = 1
-    g = Graph(n=inp, m=size)
+def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[35,10,4]):
+    #inp = 5
+    size = shape#[5]
+    #data_size = 10000
+    #in_epochs = 20
+    #batch_size = 100
+    #in_alpha = 1
+    g = Graph(n=inp, m=size, p=outp)
     data = pd.read_csv('train.csv')
     #data['xdiff'] = data['cx']-data['tx']
     #data['ydiff'] = data['cy']-data['ty']
@@ -34,10 +44,10 @@ def test():
     #test_data['ydiff'] = test_data['cy']-test_data['ty']
     tdata = test_data[['cx','cy', 'tx', 'ty', 'angle']]#, 'xdiff', 'ydiff']]
     testing_data = tdata.as_matrix()#columns=data.columns[])
-    time1 = time.time()
+    time11 = time.time()
     model = g.predict(testing_data)
-    time2 = time.time()
-    print('time taken to run trained model = {} seconds'.format(round(time2-time1, 3)))
+    time21 = time.time()
+    print('time taken to run trained model = {} seconds'.format(round(time21-time11, 3)))
     data = test_data
     count = 0
     count_chit = 0
@@ -69,6 +79,9 @@ def test():
                 count_cmiss += 1
     print('\ntotal incorrect predictions: {}, ie {}%'.format(count, round( (count*100)/10000 ,2)))
     print('correct hits: {}, correct misses: {}, hits classified as misses: {}, misses classified as hits: {}'.format(count_chit, count_cmiss, count_whit, count_wmiss))
+    f = open('Summary.csv', 'a+')
+    f.write('{},{},{},{},{},{},{},{},{},{},{},{},{}\n'.format('sigmoid', data_size, batch_size, in_alpha, in_epochs, shape, round(time2-time1, 3), round(time21-time11, 3), count_chit, count_cmiss, count_whit, count_wmiss, round( (count*100)/10000 ,2) ))
+    f.close()
 
 
 class Graph:
@@ -90,10 +103,10 @@ class Graph:
                 self.synapses.append(synapse)
             self.synapses.append(4*np.random.random((previous, self.outputs)) -2)
     
-    def sigmoid(x, n=1):
+    def sigmoid(x, n=100):
         return 1/(1+np.exp(-x/n))
 
-    def d_sigmoid(x, n=1):
+    def d_sigmoid(x, n=100):
         return (x*(1-x))/n
     
     def tanH(x):
