@@ -8,9 +8,9 @@ def main():
 def test():
     np.random.seed(0)
     inp = 7
-    size = 25
+    size = 40
     train_for = 2000
-    train_with = 10000
+    train_with = 1000
     print('shape of network is {} * {} * 2'.format(inp, size))
     g = Graph(n=inp, m=size)
     data = pd.read_csv('train.csv')
@@ -30,7 +30,7 @@ def test():
     #input()
     print('training for {} steps, with {} data points'.format(train_for, train_with))
     training_outputs = data.as_matrix(columns=data.columns[5:7])
-    model = g.train(training_data, training_outputs, steps=20000, freq=None, alpha=0.2, dots=True)
+    model = g.train(training_data, training_outputs, steps=train_for, freq=None, alpha=0.2, dots=True)
     count = 0
     count_chit = 0
     count_whit = 0
@@ -61,7 +61,7 @@ def test():
                 count_cmiss += 1
         #print('\ndifference: {} {} \t (sum={}) \t | \t {}'.format(abs(d1-m1), abs(d2-m2), round(abs(d1-m1) + abs(d2-m2), 3), res))
         #print('data: {} {}, prediction: {} {}, difference: {} {}'.format(d1, d2, m1, m2, abs(d1-m1), abs(d2-m2)))
-    print('\ntotal incorrect predictions: {}, ie {}%'.format(count, round( count/train_for ,2)))
+    print('\ntotal incorrect predictions: {}, ie {}%'.format(count, round( ((100*count)/train_with) ,2)))
     print('correct hits: {}, correct misses: {}, hits classified as misses: {}, misses classified as hits: {}'.format(count_chit, count_cmiss, count_whit, count_wmiss))
 
 

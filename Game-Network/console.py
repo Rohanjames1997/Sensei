@@ -7,20 +7,28 @@ from random import seed
 
 def main():
     #test()
-    generate_train_data()
-
-def generate_train_data():
     seed(0)
-    f = open('train.csv', 'w')
-    for i in range(100000):
-        cx = randint(1,99)
-        cy = randint(1,99)
-        ca = randint(0,180)
-        tx = randint(1,99)
-        ty = randint(1,99)
-        tr = 7#randint(1,10)
-        game = Console(Canon(x=cx, y=cy, angle=ca), Target(x=tx, y=ty, radius=tr))
-        result = game.shoot()
+    generate_data()
+    generate_data('test.csv', 10000)
+
+def generate_data(name='train.csv', records=100000):
+    f = open(name, 'w')
+    f.write('cx,cy,angle,tx,ty,hit,miss\n')
+    for i in range(records):
+        acceptable = False
+        while (not acceptable):
+            cx = randint(0,20)
+            cy = randint(0,9)
+            ca = randint(0,180)
+            tx = randint(0,20)
+            ty = randint(10,19)
+            tr = 2#randint(1,10)
+            game = Console(Canon(x=cx, y=cy, angle=ca), Target(x=tx, y=ty, radius=tr))
+            result = game.shoot()
+            if not result:
+                acceptable = (randint(0,10) < 2)
+            else:
+                acceptable = True
         if (result):
             result = '1,0'
         else:
@@ -197,7 +205,7 @@ class Console:
     
     def shoot(self, silent=True):
         result = self._hit()
-        if ():
+        if (result):
             self.score_board.hit()
         else:
             self.score_board.miss()

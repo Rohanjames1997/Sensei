@@ -3,10 +3,14 @@ import pandas as pd
 import math
 import time
 import argparse
+from random import randint
+from random import seed
+
 
 def main():
     #g = Graph()
     np.random.seed(0)
+    seed(0)
     parser = argparse.ArgumentParser()
     parser.add_argument('--training-data-size', type=int, default=10000)
     parser.add_argument('--epochs', type=int, default=10)
@@ -15,10 +19,11 @@ def main():
     #parser.add_argument('--hidden-layers', type=list, default=[5])
     parser.add_argument('--inputs', type=int, default=5)
     parser.add_argument('--outputs', type=int, default=2)
+    parser.add_argument('--comment', default='')
     args = parser.parse_args()
-    test(inp=args.inputs, outp=args.outputs, data_size=args.training_data_size, in_epochs=args.epochs, batch_size=args.batch_size, in_alpha=args.alpha)
+    test(inp=args.inputs, outp=args.outputs, data_size=args.training_data_size, in_epochs=args.epochs, batch_size=args.batch_size, in_alpha=args.alpha, comment=args.comment)
 
-def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[35,10,4]):
+def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[5], comment=''):
     #inp = 5
     size = shape#[5]
     #data_size = 10000
@@ -80,7 +85,7 @@ def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[35,10,4])
     print('\ntotal incorrect predictions: {}, ie {}%'.format(count, round( (count*100)/10000 ,2)))
     print('correct hits: {}, correct misses: {}, hits classified as misses: {}, misses classified as hits: {}'.format(count_chit, count_cmiss, count_whit, count_wmiss))
     f = open('Summary.csv', 'a+')
-    f.write('{},{},{},{},{},{},{},{},{},{},{},{},{}\n'.format('sigmoid', data_size, batch_size, in_alpha, in_epochs, shape, round(time2-time1, 3), round(time21-time11, 3), count_chit, count_cmiss, count_whit, count_wmiss, round( (count*100)/10000 ,2) ))
+    f.write('{},{},{},{},{},{},{},{},{},{},{},{},{} #{}\n'.format('sigmoid', data_size, batch_size, in_alpha, in_epochs, shape, round(time2-time1, 3), round(time21-time11, 3), count_chit, count_cmiss, count_whit, count_wmiss, round( (count*100)/10000 ,2), comment ) )
     f.close()
 
 
@@ -129,14 +134,19 @@ class Graph:
         func = np.vectorize(temp)
         return func(x)
     
-    def train(self, x, y, activation_function=sigmoid, d_activation_function=d_sigmoid, epochs=10, batch=100, alpha=1, display=10, dots=False):
+    def train(self, x, y, activation_function=sigmoid, d_activation_function=d_sigmoid, epochs=10, batch=100, alpha=1.0, display=10, dots=False):
         dispcount = 0
         #epcount = 0
+        alpha_ = alpha
         for epoch in range(epochs):
             #dotcount = 0
+            alpha = alpha-(alpha_/epochs)
+            #alpha = alpha*(0.99)
+            #print('alpha = {}'.format(alpha))
             for iteration in range(math.ceil(float(len(x))/batch)):
-                inputs = x[iteration*batch:(iteration+1)*batch]
-                y_ = y[iteration*batch:(iteration+1)*batch]
+                offset = randint(-10,10)
+                inputs = x[offset+(iteration*batch):offset+((iteration+1)*batch)]
+                y_ = y[offset+(iteration*batch):offset+((iteration+1)*batch)]
                 layer = inputs
                 layers = [layer]
                 #print(iteration)
@@ -148,7 +158,7 @@ class Graph:
                     layer = next_layer
                 for i, s in reversed(list(enumerate(self.synapses))):
                     if i == len(self.synapses)-1:
-                        error = y_ - layers[i+1]# self.synapses[len(self.synapses)-i-1]
+                        error = (y_ - layers[i+1])#np.square()# self.synapses[len(self.synapses)-i-1]
                         dispcount += 1
                         if display != 0 and dispcount % ((epochs * math.ceil(float(len(x))/batch)) / display) == 0:
                             print('Error as of {}, {} is: '.format(epoch, iteration))
