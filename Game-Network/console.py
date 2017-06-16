@@ -11,22 +11,22 @@ def main():
     generate_data()
     generate_data('test.csv', 10000)
 
-def generate_data(name='train.csv', records=100000):
+def generate_data(name='train.csv', records=300000):
     f = open(name, 'w')
     f.write('cx,cy,angle,tx,ty,hit,miss\n')
     for i in range(records):
         acceptable = False
         while (not acceptable):
-            cx = randint(0,20)
-            cy = randint(0,9)
+            cx = randint(0,99)
+            cy = 0#randint(0,9)
             ca = randint(0,180)
-            tx = randint(0,20)
-            ty = randint(10,19)
-            tr = 2#randint(1,10)
+            tx = randint(0,99)
+            ty = 80#randint(80,89)
+            tr = 3#randint(1,10)
             game = Console(Canon(x=cx, y=cy, angle=ca), Target(x=tx, y=ty, radius=tr))
             result = game.shoot()
             if not result:
-                acceptable = (randint(0,10) < 2)
+                acceptable = (randint(0,40) < 1)
             else:
                 acceptable = True
         if (result):
@@ -228,3 +228,4 @@ class Console:
 
 if __name__ == '__main__':
     main()
+
