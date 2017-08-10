@@ -1,0 +1,21 @@
+act_fun, data-size,batch_size,alpha,epochs,shape,train_time,test_time,chits,cmisses,whits,wmisses, accuracy, comment
+sigmoid,10000,100,1,10,[5],0.167,0.006,0,5800,4200,0,42.0 #
+sigmoid,60000,50,10.0,30,[15, 20],5.602,0.017,4036,3998,164,1802,19.66 #
+sigmoid,60000,10,10.0,80,[15],28.855,0.013,1682,7300,248,770,10.18 #
+sigmoid,60000,10,10.0,80,[15],27.617,0.013,2026,6872,577,525,11.02 #tweaking weights
+sigmoid,60000,10,5.0,80,[15],27.211,0.014,2268,6755,335,642,9.77 #rad2
+sigmoid,60000,10,5.0,80,[15],28.478,0.013,3049,6016,163,772,9.35 #rad2, with acc_1
+sigmoid,60000,10,5.0,80,[15],29.778,0.024,1840,7535,24,601,6.25 #rad2, with acc_1, target further
+sigmoid,80000,50,15.0,80,[5],8.49,0.002,0,8562,1438,0,14.38 #rad2, with acc_1, target further
+sigmoid,90000,50,20.0,200,[5],25.254,0.003,1225,8101,140,534,6.74 #rad2, with acc_1, larger xrange
+sigmoid,90000,50,20.0,200,[5],25.992,0.008,2332,7049,23,596,6.19 #rad2, with acc_1, larger xrange, more hit%
+sigmoid,90000,50,20.0,200,[5],26.863,0.005,2577,6739,66,618,6.84 #rad1, with acc_1<50, larger xrange
+sigmoid,90000,50,20.0,200,[5],25.916,0.004,3687,2927,26,3360,33.86 #rad1, with acc_1<80, larger xrange, sigmoid50
+sigmoid,90000,50,20.0,200,[5],49.268,0.002,3713,0,0,6287,62.87 #rad1, with acc_1<80, larger xrange, tanH100
+sigmoid,99500,40,1.0,40,[5],6.772,0.002,3652,2953,61,3334,33.95 #rad1, wth acc_1<80, larger xrange, sigmoid20, linear_dim_alpha
+sigmoid,99500,40,1.0,40,[5],6.917,0.002,3682,5726,31,561,5.92 #rad1, wth acc_1<80, larger xrange, sigmoid20, exp_dim_alpha
+sigmoid,99500,40,1.0,30,[5],4.386,0.002,5536,4284,1,179,1.8 #rad3, wth acc_1<50, target y_fixed, x45-55
+sigmoid,190000,38,0.7,30,[5],8.8,0.002,4911,5013,18,58,0.76 #rad3, wth acc_1<40, target,cannon, y_fixed, x_constrained for target
+sigmoid,190000,38,0.8,30,[5],9.085,0.002,4923,5011,6,60,0.66 #rad3, wth acc_1<40, target,cannon, y_fixed, x_constrained for target
+sigmoid,190000,38,0.88,30,[5],8.639,0.002,4910,4932,19,139,1.58 #rad3, wth acc_1<40, target,cannon, y_fixed, x_constrained for target
+sigmoid,190000,38,0.8,30,[5],8.913,0.002,4923,5011,6,60,0.66 #rad3, wth acc_1<40, target,cannon, y_fixed, x_constrained for target

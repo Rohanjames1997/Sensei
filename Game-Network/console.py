@@ -7,26 +7,26 @@ from random import seed
 
 def main():
     #test()
-    seed(0)
+    seed(1)
     generate_data()
-    generate_data('test.csv', 10000)
+    generate_data(10,'test.csv', 20000)
 
-def generate_data(name='train.csv', records=300000):
+def generate_data(limit=15, name='train.csv', records=3000000):
     f = open(name, 'w')
     f.write('cx,cy,angle,tx,ty,hit,miss\n')
     for i in range(records):
         acceptable = False
         while (not acceptable):
-            cx = randint(0,99)
-            cy = 0#randint(0,9)
+            cx = randint(0,100)
+            cy = randint(0,50)
             ca = randint(0,180)
-            tx = randint(0,99)
-            ty = 80#randint(80,89)
+            tx = randint(0,100)
+            ty = randint(50,100)
             tr = 3#randint(1,10)
             game = Console(Canon(x=cx, y=cy, angle=ca), Target(x=tx, y=ty, radius=tr))
             result = game.shoot()
             if not result:
-                acceptable = (randint(0,40) < 1)
+                acceptable = (randint(0,limit) < 1)
             else:
                 acceptable = True
         if (result):
@@ -224,6 +224,16 @@ class Console:
         dy = self.get_target_radius() * 3 * math.sin(math.radians(self.get_canon_angle()))
         self.canvas.plot_line_segment(x, y, dx, dy)
         plt.show()
+    
+    def display2f(self, filename='static/capt.png'):
+        self.canvas.setup_display()
+        self.canvas.plot_circle(self.get_target_position(), self.get_target_radius())
+        x, y = self.get_canon_position()
+        dx = self.get_target_radius() * 3 * math.cos(math.radians(self.get_canon_angle()))
+        dy = self.get_target_radius() * 3 * math.sin(math.radians(self.get_canon_angle()))
+        self.canvas.plot_line_segment(x, y, dx, dy)
+        plt.savefig(filename)
+        plt.gcf().clear()
         
 
 if __name__ == '__main__':

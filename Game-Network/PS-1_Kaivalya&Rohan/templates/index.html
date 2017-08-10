@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>Gameplaying AI Neural Network for PS1 at Sensei Technologies</title>
+        <script type="text/javascript">
+            function randInt(start, end) {
+                return Math.random() * (end - start) + start;
+            }
+            
+            function populate() {
+                document.getElementById('CX').value=randInt(0,100);
+                document.getElementById('CY').value=randInt(0,50);
+                document.getElementById('TX').value=randInt(0,100);
+                document.getElementById('TY').value=randInt(50,100);
+                document.getElementById('ANG').value=randInt(0,180);
+            }
+        </script>
+    </head>
+    <body style="margin: auto; padding: 50px;">
+        <div style="margin: auto; text-align:center; float: left;">
+            <p>
+                <input type="button" value="Randomize" onclick="javascript: populate();">
+            </p>
+            <form action="#">
+                <p>
+                    CX: <input id="CX" type="range" step="0.1" value="{{ cx }}" min="0" max="100" name="cx" onchange="javascript: document.getElementById('CXd').innerHTML = document.getElementById('CX').value">
+                    <span id="CXd">{{ cx }}</span>
+                </p>
+                <p>
+                    CY: <input id="CY" type="range" step="0.1" value="{{ cy }}"min="0" max="50" name="cy" onchange="javascript: document.getElementById('CYd').innerHTML = document.getElementById('CY').value">
+                    <span id="CYd">{{ cy }}</span>
+                </p>
+                <p>
+                    TX: <input id="TX" type="range" step="0.1" value="{{ tx }}" min="0" max="100" name="tx" onchange="javascript: document.getElementById('TXd').innerHTML = document.getElementById('TX').value">
+                    <span id="TXd">{{ tx }}</span>
+                </p>
+                <p>
+                    TY: <input id="TY" type="range"step="0.1" value="{{ ty }}" name="ty" min="50" max="100" onchange="javascript: document.getElementById('TYd').innerHTML = document.getElementById('TY').value">
+                    <span id="TYd">{{ ty }}</span>
+                </p>
+                <p>
+                    Angle: <input id="ANG" type="range" step="1" value="{{ angle }}" name="angle" min="0" max="180" onchange="javascript: document.getElementById('ANGd').innerHTML = document.getElementById('ANG').value">
+                    <span id="ANGd">{{ angle }}</span>
+                </p>
+            <hr>
+                <p>
+                    <input type="submit" value="Submit">
+                </p>
+            </form>
+            <p>
+                {{ answer }}
+                <br>
+                {{ validation }}
+            </p>
+        </div>
+        <div style="float = right;">
+            <img src="{{ figure }}" width="400px"></img>
+        </div>
+    </body>
+</html>

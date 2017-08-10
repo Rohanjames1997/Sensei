@@ -5,25 +5,29 @@ import time
 import argparse
 from random import randint
 from random import seed
+from flask import Flask, request, render_template
+import pickle
+from console import Console, Canon, Target
 
-
+app = Flask(__name__)
 def main():
     #g = Graph()
     np.random.seed(0)
     seed(0)
     parser = argparse.ArgumentParser()
-    parser.add_argument('--training-data-size', type=int, default=50000)
+    parser.add_argument('--training-data-size', type=int, default=100000)
     parser.add_argument('--epochs', type=int, default=10)
-    parser.add_argument('--batch-size', type=int, default=100)
+    parser.add_argument('--batch-size', type=int, default=50)
     parser.add_argument('--alpha', type=float, default=1)
     #parser.add_argument('--hidden-layers', type=list, default=[5])
     parser.add_argument('--inputs', type=int, default=5)
     parser.add_argument('--outputs', type=int, default=2)
     parser.add_argument('--comment', default='')
+    parser.add_argument('--save-file', default='model.pickle')
     args = parser.parse_args()
-    test(inp=args.inputs, outp=args.outputs, data_size=args.training_data_size, in_epochs=args.epochs, batch_size=args.batch_size, in_alpha=args.alpha, comment=args.comment)
+    test(inp=args.inputs, outp=args.outputs, data_size=args.training_data_size, in_epochs=args.epochs, batch_size=args.batch_size, in_alpha=args.alpha, comment=args.comment, filename=args.save_file)
 
-def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[5], comment=''):
+def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[5], comment='', filename='model.pickle'):
     #inp = 5
     size = shape#[5]
     #data_size = 10000
@@ -41,7 +45,7 @@ def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[5], comme
     print('training with a total of {} data rows for {} epochs, with {} data rows per batch, and an alpha value of {}'.format(data_size, in_epochs, batch_size, in_alpha))
     training_outputs = data.as_matrix(columns=data.columns[5:7])
     time1 = time.time()
-    g.train(training_data, training_outputs, activation_function=Graph.sigmoid, d_activation_function=Graph.d_sigmoid, epochs=in_epochs, batch=batch_size, alpha=in_alpha, dots=False, display=0)
+    g.train(training_data, training_outputs, activation_function=Graph.sigmoid, d_activation_function=Graph.d_sigmoid, epochs=in_epochs, batch=batch_size, alpha=in_alpha, dots=False, display=0, saved_file=filename)
     time2 = time.time()
     print('time taken to train = {} seconds'.format(round(time2-time1, 3)))
     test_data = pd.read_csv('test.csv')
@@ -82,10 +86,20 @@ def test(inp, outp, data_size, in_epochs, batch_size, in_alpha, shape=[5], comme
                 count_chit += 1
             else:
                 count_cmiss += 1
-    print('\ntotal incorrect predictions: {}, ie {}%'.format(count, round( (count*100)/10000 ,2)))
+    print('\ntotal incorrect predictions: {}, ie {}%'.format(count, round( (count*100)/len(model) ,2)))
     print('correct hits: {}, correct misses: {}, hits classified as misses: {}, misses classified as hits: {}'.format(count_chit, count_cmiss, count_whit, count_wmiss))
-    f = open('Summary.csv', 'a+')
-    f.write('{},{},{},{},{},{},{},{},{},{},{},{},{} #{}\n'.format('sigmoid', data_size, batch_size, in_alpha, in_epochs, shape, round(time2-time1, 3), round(time21-time11, 3), count_chit, count_cmiss, count_whit, count_wmiss, round( (count*100)/10000 ,2), comment ) )
+    """
+    print("\n\n\n\n\n")
+    l=[int(user) for user in input("Enter the x coordinate of the cannon <space> angle \n").split()]
+    mod=[l[0],training_data[0][1],training_data[0][2],training_data[0][3],l[1]]
+    predx=g.predict(mod)
+    resx="Miss"
+    if predx[0]>predx[1]:
+        resx="Hit"
+    print (resx)
+    """
+    f = open('Summary_new.csv', 'a+')
+    f.write('{},{},{},{},{},{},{},{},{},{},{},{},{},{} #{}\n'.format('sigmoid', data_size, batch_size, in_alpha, in_epochs, shape, round(time2-time1, 3), round(time21-time11, 3), count_chit, count_cmiss, count_whit, count_wmiss, round( (count*100)/len(model) ,2), filename, comment ) )
     f.close()
 
 
@@ -98,20 +112,20 @@ class Graph:
         self.outputs = p
         self.synapses = []
         if self.hidden_layers == 0:
-            self.synapses.append(4*np.random.random((self.placeholders, self.outputs)) -2)
+            self.synapses.append(2*np.random.random((self.placeholders, self.outputs)) -1)
         else:
-            self.synapses.append(4*np.random.random((self.placeholders, m[0])) -2)
+            self.synapses.append(2*np.random.random((self.placeholders, m[0])) -1)
             previous = m[0]
             for layer in m[1:]:
-                synapse = 4*np.random.random((previous, layer)) -2
+                synapse = 2*np.random.random((previous, layer)) -1
                 previous = layer
                 self.synapses.append(synapse)
-            self.synapses.append(4*np.random.random((previous, self.outputs)) -2)
+            self.synapses.append(2*np.random.random((previous, self.outputs)) -1)
     
-    def sigmoid(x, n=20):
+    def sigmoid(x, n=50):
         return 1/(1+np.exp(-x/n))
 
-    def d_sigmoid(x, n=20):
+    def d_sigmoid(x, n=50):
         return (x*(1-x))/n
     
     def tanH(x,n=100):
@@ -134,7 +148,7 @@ class Graph:
         func = np.vectorize(temp)
         return func(x)
     
-    def train(self, x, y, activation_function=sigmoid, d_activation_function=d_sigmoid, epochs=10, batch=100, alpha=1.0, display=10, dots=False):
+    def train(self, x, y, activation_function=sigmoid, d_activation_function=d_sigmoid, epochs=10, batch=100, alpha=1.0, display=10, dots=False, saved_file="model.pickle"):
         dispcount = 0
         #epcount = 0
         alpha_ = alpha
@@ -172,38 +186,11 @@ class Graph:
                     #dotcount += 1
             if (dots):# and epcount % (epochs / 50) == 0):
                 print('')
+        with open(saved_file, 'wb') as f:
+            pickle.dump(self, f)
                 #epcount += 1
-                """for i, l in reversed(list(enumerate(layers))):
-                    if i == len(layers)-1:
-                        error = y - l
-                    else:
-                        delta.dot(self.synapses[].T)
-                    delta = error*Graph.d_sigmoid(l)
-                    self.synapses[i-1]
-                """
-                """
-                for i in range(self.hidden_layers):
-                    layer = Graph.sigmoid(np.dot(layer, self.synapses[i]))
-                    layers.append(layer)
-                layers.append(Graph.sigmoid(np.dot(layers[-1], self.synapses[-1])))
-                """
-        """
-        for i in range(steps):
-            l0 = x
-            l1 = Graph.sigmoid(np.dot(l0, self.syn0))
-            l2 = Graph.sigmoid(np.dot(l1, self.syn1))
-            
-            
-            l2_error = y-l2
-            l2_delta = l2_error*Graph.d_sigmoid(l2)
-            self.syn1 += alpha * l1.T.dot(l2_delta)
-            
-            
-            l1_error = l2_delta.dot(self.syn1.T)
-            l1_delta = l1_error*Graph.d_sigmoid(l1)
-            self.syn0 += alpha * l0.T.dot(l1_delta)
-        """
         
+    
     def predict (self, data, func=sigmoid):
         inputs = data
         layer = inputs
@@ -213,8 +200,46 @@ class Graph:
             layers.append(next_layer)
             layer = next_layer
         return layers[-1]
-                
+    
+  
+@app.route('/')
+def server(cx=0, cy=0, tx=0, ty=0, angle=0, saved_file="model.pickle"):
+    cx = request.args.get('cx', "CX")
+    cy = request.args.get('cy', "CY")
+    tx = request.args.get('tx', "TX")
+    ty = request.args.get('ty', "TY")
+    angle = request.args.get('angle', "ANG")
+    if (cx == "CX" or cy == "CY" or tx == "TX" or ty == "TY" or angle == "ANG"):
+        return render_template('index.html')
+    cx = float(cx)
+    tx = float(tx)
+    cy = float(cy)
+    ty = float(ty)
+    angle = float(angle)
+    g = None
+    with open(saved_file, 'rb') as f:
+        g = pickle.load(f)
+    if g is None:
+        return "Error - couldn't load model"
+    #return ('{} | {} | {} | {}'.format(cx, angle, type(cx), type(angle)))
+    result = g.predict([cx,cy,tx,ty,angle])
+    
+    res= {'model':'miss', 'actual':'miss'}
+    if result[0]>result[1]:
+        res['model']='hit';
+    game = Console(Canon(x=cx, y=cy, angle=angle), Target(x=tx, y=ty, radius=3))
+    result = game.shoot()
+    game.display2f()
+    if result:
+        res['actual']='hit'
+    valid = 'MODEL PREDICTION IS CORRECT!'
+    if res['actual'] != res['model']:
+        valid = 'MODEL PREDICTION IS INCORRECT.'
+    figID = '/static/capt.png?{}{}{}{}{}'.format(cx,cy,tx,ty,angle)
+    return render_template('index.html', answer=str(res), validation=str(valid), cx=str(cx), cy=cy, tx=tx, ty=ty, angle=angle, figure=figID)
+
 
 if __name__ == '__main__':
-    main()
-
+    #main()
+    app.run()
+    
